@@ -1,5 +1,7 @@
 export function PageAdmin() {
     return (
-        <div>Admin!</div>
+        <div>
+            Admin panel with filters by users and work
+        </div>
     )
 }

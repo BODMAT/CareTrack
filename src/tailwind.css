@@ -4,7 +4,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 @layer base {
     .transitioned {
-        @apply transition-all duration-300 ease-[cubic-bezier(0.075,0.82,0.165,1)];
+        @apply transition-all duration-500 ease-[cubic-bezier(0.075,0.82,0.165,1)];
     }
     .myContainer {
         @apply max-w-[1300px] mx-auto box-content px-[15px];
@@ -21,4 +21,17 @@
         font-optical-sizing: auto;
         font-style: normal;
     }
+
+    :root {
+        --color-text: #000000;
+        --color-fixed: linear-gradient(90deg, #54fe95, #00ffcc); /* неоновий зелено-бірюзовий */
+        --color-background: linear-gradient(135deg, #e0ffe0, #ccfff2); /* м’який світлий */
+      }
+      
+      :where(.dark, .dark *) {
+        --color-text: #ffffff;
+        --color-fixed: linear-gradient(135deg, #123720, #0f3237); /* темний неоновий зелено-бірюзовий */
+        --color-background: linear-gradient(90deg, #042a20, #06443d);
+      }
+      
 }
