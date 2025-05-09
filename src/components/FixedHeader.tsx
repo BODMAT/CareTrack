@@ -4,6 +4,7 @@ import { useAuth } from "../hooks/useAuth";
 
 export function FixedHeader() {
     const { user, login, logout, loading } = useAuth()
+
     function handleLoginOrLogout() {
         if (!user) {
             login();
@@ -22,7 +23,7 @@ export function FixedHeader() {
                             <Link className="text-[var(--color-text)] fontText px-8 py-5 text-center rounded-2xl bg-[image:var(--color-background)] border-2 transition-transform transform hover:scale-110 hover:rotate-3 hover:shadow-xl cursor-pointer transitioned max-sm:text-[12px] max-[450px]:py-3 max-[450px]:px-2" to={currentPath.includes("admin") ? "/dashboard" : "/admin"}>{currentPath.includes("admin") ? "Dashboard" : "Admin панель"}</Link>
                         )}
                         <button onClick={() => handleLoginOrLogout()} className="text-[var(--color-text)] fontText px-8 py-5 rounded-2xl bg-[image:var(--color-background)] border-2 transition-transform transform hover:scale-110 hover:rotate-3 hover:shadow-xl cursor-pointer transitioned max-sm:text-[12px] max-[450px]:py-3 max-[450px]:px-2">
-                            {loading ? "Завантаження..." : user ? "Вийти" : "Увійти"}
+                            {loading ? "Завантаження..." : user?.displayName ? "Вийти" : "Увійти"}
                         </button>
                     </div>
 

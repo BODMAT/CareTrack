@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "../../hooks/useAuth";
 import { usePopupStore } from "../../store/popup"
 import { textFromTopAnimation } from "../../utils/animations";
+import { AddAnimal } from "../Modals/AddAnimal";
 export function ButtonsToModals() {
     const { open } = usePopupStore();
     const { user } = useAuth()
@@ -18,7 +19,7 @@ export function ButtonsToModals() {
                     className="text-[var(--color-text)] fontText px-8 py-5 rounded-2xl bg-[image:var(--color-background)] border-2 transition-transform hover:scale-95 hover:shadow-xl cursor-pointer
                 ">Додати догляд</button>
                 <button
-                    onClick={() => { user ? open("Форма для додавання тварини", <p className="mb-5">...</p>) : open("Notification", <p className="mb-5">Спочатку авторизуйтеся</p>) }}
+                    onClick={() => { user ? open("Форма для додавання тварини", <AddAnimal />) : open("Notification", <p className="mb-5">Спочатку авторизуйтеся</p>) }}
                     className="text-[var(--color-text)] fontText px-8 py-5 rounded-2xl bg-[image:var(--color-background)] border-2 transition-transform hover:scale-95 hover:shadow-xl cursor-pointer
                 ">Додати тварину</button>
                 <button
