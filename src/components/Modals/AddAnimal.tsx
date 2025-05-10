@@ -1,9 +1,12 @@
 import { useForm } from "react-hook-form";
 import type { IAnimal } from "../../arcitecture/main";
 import { useAddAnimal } from "../../hooks/useAnimals";
+import { usePopupStore } from "../../store/popup";
+import { useEffect } from "react";
 export function AddAnimal() {
     const { register, handleSubmit, formState: { errors }, reset } = useForm<IAnimal>();
-    const addAnimal = useAddAnimal();
+    const { addAnimal, status } = useAddAnimal();
+    const { specialConfirmation, setSpecialConfirmation, close } = usePopupStore();
 
     const onSubmit = (animal: IAnimal) => {
         addAnimal.mutate(animal, {
@@ -13,14 +16,38 @@ export function AddAnimal() {
 
     const onClear = () => {
         reset();
+        close()
     };
+
+    useEffect(() => {
+        if (specialConfirmation) {
+            handleSubmit(
+                (data) => {
+                    alert("Поля валідні, тому зберігаю");
+                    onSubmit(data);
+                    close();
+                },
+                () => {
+                    alert("Поля не валідні, тому збереження не відбулося");
+                    setSpecialConfirmation(false);
+                }
+            )();
+        }
+    }, [specialConfirmation]);
 
     return (
         <form className="fontText flex flex-col gap-2 max-h-[80vh] overflow-y-auto overflow-x-hidden myContainer" onSubmit={handleSubmit(onSubmit)}>
             <input
                 className="m-1 w-full border-2 border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="Введіть назву тварини"
-                {...register("petSpecies", { required: "Назва тварини обов'язкова" })} />
+                {...register("petSpecies", {
+                    required: "Назва тварини обов'язкова",
+                    pattern: {
+                        value: /^[a-zA-Zа-яА-ЯіїєґІЇЄҐ\s'-]+$/u, //regex +
+                        message: "Назва може містити лише літери (укр або англ)"
+                    }
+                })}
+            />
             {errors.petSpecies && <p className="text-red-600">{errors.petSpecies.message}</p>}
 
             <input
@@ -85,9 +112,15 @@ export function AddAnimal() {
                     onClick={onClear}
                     className="text-[var(--color-text)] fontText px-8 py-5 rounded-2xl bg-[image:var(--color-background)] border-2 transition-transform hover:scale-95 hover:shadow-xl cursor-pointer"
                 >
-                    Очистити
+                    Очистити і вийти
                 </button>
             </div>
+            {status === "success" && (
+                <p className="text-green-600 text-center">Тварина додана</p>
+            )}
+            {status === "error" && (
+                <p className="text-red-600 text-center">Не вдалося додати тварину</p>
+            )}
         </form>
     )
 }

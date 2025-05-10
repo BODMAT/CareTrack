@@ -17,8 +17,3 @@ export function getTheme() {
         document.documentElement.classList.remove('dark');
     }
 }
-
-//! realize in future
-export const generateCustomUid = (role: "user" | "admin", email: string | null) => {
-    return `${role}-${email?.toLowerCase().replace(/[^a-z0-9]/g, "")}`;
-};

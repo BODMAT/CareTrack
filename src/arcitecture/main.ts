@@ -38,7 +38,7 @@ export class Animal implements IAnimal {
 }
 
 export interface IAssignment {
-    animal: Animal;
+    animal: IAnimal;
     work: Work;
     price: number;
 }
@@ -70,17 +70,17 @@ export class Assignment implements IAssignment {
 export interface ICare {
     ownersSurname: string;
     date: Date;
-    assignments: Array<Assignment>;
-    addOrder: (assignment: Assignment) => void;
+    assignments: IAssignment[];
+    addOrder: (assignment: IAssignment) => void;
     toShortString: () => string;
 }
 
 export class Care implements ICare {
     private _ownersSurname: string;
     private _date: Date;
-    private _assignments: Array<Assignment>;
+    private _assignments: IAssignment[];
 
-    constructor(ownersSurname: string, date: Date, assignments: Assignment[] = []) {
+    constructor(ownersSurname: string, date: Date, assignments: IAssignment[] = []) {
         this._ownersSurname = ownersSurname;
         this._date = date;
         this._assignments = assignments;
@@ -96,7 +96,7 @@ export class Care implements ICare {
         return this._assignments;
     }
 
-    addOrder(assignment: Assignment): void {
+    addOrder(assignment: IAssignment): void {
         this._assignments.push(assignment);
     }
 

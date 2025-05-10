@@ -5,7 +5,7 @@ import crossSVG from "../assets/cross.svg";
 import { usePopupStore } from "../store/popup";
 
 export function PopUp() {
-    const { active, title, children, close } = usePopupStore();
+    const { active, title, children, close, hasCheckAfterClose: hasCheckAfterClose, setSpecialConfirmation } = usePopupStore();
 
     useEffect(() => {
         if (active) {
@@ -25,6 +25,19 @@ export function PopUp() {
 
     if (!active) return null;
 
+    const handleClose = () => {
+        if (hasCheckAfterClose) {
+            const answer = confirm("Зберегти зміни?");
+            if (answer) {
+                setSpecialConfirmation(answer);
+            } else {
+                close()
+            }
+        } else {
+            close()
+        }
+    }
+
     return ReactDOM.createPortal(
         <motion.section
             initial={{ opacity: 0 }}
@@ -42,7 +55,7 @@ export function PopUp() {
             >
                 <div className="bg-[#121212] flex justify-between items-center p-4">
                     <h2 className="fontTitle text-2xl font-bold text-white">{title}</h2>
-                    <button onClick={close} className="text-2xl font-bold cursor-pointer">
+                    <button onClick={handleClose} className="text-2xl font-bold cursor-pointer">
                         <img src={crossSVG} alt="Close" />
                     </button>
                 </div>

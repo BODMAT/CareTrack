@@ -5,7 +5,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { usePopupStore } from "../store/popup";
 
 interface AppUser {
-    uid: string; //! change in future
+    uid: string;
     email: string | null;
     displayName: string | null;
     photoURL: string | null;
