@@ -2,9 +2,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "./useAuth";
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
 import { db } from "../apis/firebase";
-import type { Status } from "../arcitecture/types";
+import type { Status } from "../architecture/types";
 import { useState } from "react";
-import { Animal, AnimalDTO, type IAnimal } from "../arcitecture/Animal";
+import { Animal, AnimalDTO, type IAnimal } from "../architecture/Animal";
 
 // Для отримання тварин користувача
 export const useUserAnimals = () => {

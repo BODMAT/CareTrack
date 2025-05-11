@@ -1,7 +1,6 @@
 import { createAssignmentID } from "../utils/utils";
 import { Animal, type IAnimal } from "./Animal";
-
-export type Work = "годування" | "прибирання приміщення" | "медогляд" | "випас";
+import type { Work } from "./types";
 
 export interface IAssignment {
     id: string;

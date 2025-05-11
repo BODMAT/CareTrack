@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
 import { useAuth } from './useAuth';
-import { Assignment, AssignmentDTO, type IAssignment } from '../arcitecture/Assignment';
+import { Assignment, AssignmentDTO, type IAssignment } from '../architecture/Assignment';
 import { db } from '../apis/firebase';
 import { useState } from 'react';
-import type { Status } from '../arcitecture/types';
-import { Animal } from '../arcitecture/Animal';
+import type { Status } from '../architecture/types';
+import { Animal } from '../architecture/Animal';
 
 export const useUserAssignments = () => {
     const { user } = useAuth();

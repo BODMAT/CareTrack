@@ -67,7 +67,7 @@ export class Care implements ICare {
     toPlain(): ICare {
         return {
             ownersSurname: this._ownersSurname,
-            date: Array.isArray(this._date) ? this._date : [this._date.toISOString()],
+            date: this._date,
             assignments: this._assignments.map((a) =>
                 typeof a === "string" ? a : JSON.stringify(a.toPlain())
             ),

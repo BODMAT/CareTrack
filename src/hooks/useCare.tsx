@@ -3,8 +3,8 @@ import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase
 import { useAuth } from "./useAuth";
 import { db } from "../apis/firebase";
 import { useState } from "react";
-import type { Status } from "../arcitecture/types";
-import { Care, CareDTO, type ICare } from "../arcitecture/Care";
+import type { Status } from "../architecture/types";
+import { Care, CareDTO, type ICare } from "../architecture/Care";
 
 export const useUserCares = () => {
     const { user } = useAuth();

@@ -2,8 +2,8 @@ import { useForm } from "react-hook-form";
 import { useAddAnimal } from "../../hooks/useAnimals";
 import { usePopupStore } from "../../store/popup";
 import { useEffect } from "react";
-import { Animal } from "../../arcitecture/Animal";
-import type { AnimalFormValues } from "../../arcitecture/types";
+import { Animal } from "../../architecture/Animal";
+import type { AnimalFormValues } from "../../architecture/types";
 
 export function AddAnimal() {
     const { register, handleSubmit, formState: { errors }, reset } = useForm<AnimalFormValues>();

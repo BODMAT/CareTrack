@@ -4,15 +4,17 @@ import { usePopupStore } from "../../store/popup";
 import { useUserAssignments } from "../../hooks/useAssignments";
 import Select from "react-select";
 import { useAddCare } from "../../hooks/useCare";
-import { Care, type ICare } from "../../arcitecture/Care";
-import type { IAssignment } from "../../arcitecture/Assignment";
+import { Care, type ICare } from "../../architecture/Care";
+import type { Assignment } from "../../architecture/Assignment";
+import { useAuth } from "../../hooks/useAuth";
 
 export function AddCare() {
-    const { register, handleSubmit, formState: { errors }, reset, control } = useForm<ICare>();
+    const { register, handleSubmit, formState: { errors }, reset, control, setValue } = useForm<ICare>();
     const { specialConfirmation, setSpecialConfirmation, close } = usePopupStore();
     const { addCare, status } = useAddCare();
     const { data: assignments = [] } = useUserAssignments();
     const [assignmentIndex, setAssignmentIndex] = useState<number[]>([]);
+    const { user } = useAuth()
 
     const onSubmit = (care: ICare) => {
         addCare.mutate(
@@ -46,17 +48,25 @@ export function AddCare() {
         }
     }, [specialConfirmation]);
 
-    const assignmentOptions = assignments.map((assignment) => ({
+    const assignmentOptions = assignments.map((assignment, index) => ({
         ...assignment,
         value: assignment.id,
-        label: `${assignment.animal.name} (Вид: ${assignment.animal.petSpecies}, ${assignment.animal.birthYear} року народження), ${assignment.work}, ${assignment.price} грн`
-    }));
+        label: `${assignment.animal.name} (Вид: ${assignment.animal.petSpecies}, ${assignment.animal.birthYear} року народження), ${assignment.work}, ${assignment.price} грн`,
+        index
+    })) as unknown as Assignment[]; // погана практика але тут допустимо
+
+    // Функція для обробки вибору елементів
+    const handleSelectChange = (selectedOptions: any) => {
+        const selectedIndices = selectedOptions.map((option: any) => option.index);
+        setAssignmentIndex(selectedIndices);
+        setValue("assignments", selectedOptions);
+    };
 
     return (
         <form className="fontText flex flex-col gap-2 max-h-[80vh] overflow-y-auto overflow-x-hidden myContainer" onSubmit={handleSubmit(onSubmit)}>
 
-            {/* Поле для вводу прізвища власника */}
             <input
+                defaultValue={(user && user.displayName) ? user.displayName : ""}
                 type="text"
                 className="m-1 w-full border-2 border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="Введіть прізвище власника"
@@ -64,7 +74,6 @@ export function AddCare() {
             />
             {errors.ownersSurname && <p className="text-red-600">{errors.ownersSurname.message}</p>}
 
-            {/* Поле для вибору дати */}
             <input
                 type="date"
                 className="m-1 w-full border-2 border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -72,9 +81,6 @@ export function AddCare() {
             />
             {errors.date && <p className="text-red-600">{errors.date.message}</p>}
 
-
-
-            {/* Багатовибірковий селект для вибору завдань */}
             <Controller
                 name="assignments"
                 control={control}
@@ -83,7 +89,8 @@ export function AddCare() {
                     <Select
                         {...field}
                         isMulti
-                        // options={assignmentOptions}
+                        options={assignmentOptions}
+                        onChange={handleSelectChange} // Обробник зміни
                         classNamePrefix="select"
                         className="m-1 w-full border-2 border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
@@ -91,9 +98,6 @@ export function AddCare() {
             />
             {errors.assignments && <p className="text-red-600">{errors.assignments.message}</p>}
 
-
-
-            {/* Кнопки для додавання і очищення */}
             <div className="flex items-center justify-center gap-3 flex-wrap">
                 <button
                     type="submit"

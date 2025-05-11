@@ -1,4 +1,4 @@
-import type { Work } from "../arcitecture/Assignment";
+import type { Work } from "../architecture/Assignment";
 
 export function getTheme() {
     const raw = localStorage.getItem('theme-storage-caretrack');

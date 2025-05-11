@@ -3,7 +3,8 @@ import { useAddAssignment } from "../../hooks/useAssignments";
 import { useEffect, useState } from "react";
 import { usePopupStore } from "../../store/popup";
 import { useUserAnimals } from "../../hooks/useAnimals";
-import type { IAssignment, Work } from "../../arcitecture/Assignment";
+import type { IAssignment } from "../../architecture/Assignment";
+import type { Work } from "../../architecture/types";
 
 const workOptions: Work[] = ["годування", "прибирання приміщення", "медогляд", "випас"];
 
@@ -63,7 +64,6 @@ export function AddAssignment() {
                         const selected = animals.findIndex(animal =>
                             JSON.stringify(animal) === value
                         );
-                        console.log(selected);
                         setAnimalIndex(selected);
                     },
                 })}
