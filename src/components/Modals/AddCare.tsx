@@ -1,21 +1,28 @@
 import { Controller, useForm } from "react-hook-form";
-import type { ICare, IAssignment } from "../../arcitecture/main";
-import { useAddAssignmentToCare, useAddCare } from "../../hooks/useCare";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePopupStore } from "../../store/popup";
 import { useUserAssignments } from "../../hooks/useAssignments";
 import Select from "react-select";
+import { useAddCare } from "../../hooks/useCare";
+import { Care, type ICare } from "../../arcitecture/Care";
+import type { IAssignment } from "../../arcitecture/Assignment";
 
 export function AddCare() {
     const { register, handleSubmit, formState: { errors }, reset, control } = useForm<ICare>();
     const { specialConfirmation, setSpecialConfirmation, close } = usePopupStore();
     const { addCare, status } = useAddCare();
     const { data: assignments = [] } = useUserAssignments();
+    const [assignmentIndex, setAssignmentIndex] = useState<number[]>([]);
 
     const onSubmit = (care: ICare) => {
-        addCare.mutate(care, {
-            onSuccess: () => reset()
-        });
+        addCare.mutate(
+            new Care(
+                care.ownersSurname,
+                care.date,
+                assignmentIndex.map(index => assignments[index])
+            ),
+            { onSuccess: () => reset() }
+        );
     };
 
     const onClear = () => {
@@ -43,7 +50,7 @@ export function AddCare() {
         ...assignment,
         value: assignment.id,
         label: `${assignment.animal.name} (Вид: ${assignment.animal.petSpecies}, ${assignment.animal.birthYear} року народження), ${assignment.work}, ${assignment.price} грн`
-    })) as IAssignment[];
+    }));
 
     return (
         <form className="fontText flex flex-col gap-2 max-h-[80vh] overflow-y-auto overflow-x-hidden myContainer" onSubmit={handleSubmit(onSubmit)}>
@@ -76,7 +83,7 @@ export function AddCare() {
                     <Select
                         {...field}
                         isMulti
-                        options={assignmentOptions}
+                        // options={assignmentOptions}
                         classNamePrefix="select"
                         className="m-1 w-full border-2 border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                     />

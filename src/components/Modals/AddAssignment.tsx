@@ -1,22 +1,33 @@
 import { useForm } from "react-hook-form";
-import type { IAssignment, Work } from "../../arcitecture/main";
 import { useAddAssignment } from "../../hooks/useAssignments";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePopupStore } from "../../store/popup";
 import { useUserAnimals } from "../../hooks/useAnimals";
+import type { IAssignment, Work } from "../../arcitecture/Assignment";
 
 const workOptions: Work[] = ["годування", "прибирання приміщення", "медогляд", "випас"];
 
 export function AddAssignment() {
-    const { register, handleSubmit, formState: { errors }, reset } = useForm<IAssignment>();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        reset,
+    } = useForm<IAssignment>();
+
     const { addAssignment, status } = useAddAssignment();
     const { specialConfirmation, setSpecialConfirmation, close } = usePopupStore();
     const { data: animals = [] } = useUserAnimals();
 
+    const [animalIndex, setAnimalIndex] = useState<number>(-1);
     const onSubmit = (assignment: IAssignment) => {
-        addAssignment.mutate(assignment, {
-            onSuccess: () => reset()
-        });
+        addAssignment.mutate(
+            {
+                ...assignment,
+                animal: animals[animalIndex],
+            },
+            { onSuccess: () => reset() }
+        );
     };
 
     const onClear = () => {
@@ -45,7 +56,17 @@ export function AddAssignment() {
 
             <select
                 className="m-1 w-full border-2 border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                {...register("animal", { required: "Оберіть тварину" })}
+                {...register("animal", {
+                    required: "Оберіть тварину",
+                    onChange(event) {
+                        const value = event.target.value;
+                        const selected = animals.findIndex(animal =>
+                            JSON.stringify(animal) === value
+                        );
+                        console.log(selected);
+                        setAnimalIndex(selected);
+                    },
+                })}
             >
                 <option value="">Оберіть тварину</option>
                 {animals.map(animal => (
@@ -84,7 +105,6 @@ export function AddAssignment() {
             </div>
             {errors.price && <p className="text-red-600">{errors.price.message}</p>}
 
-
             <div className="flex items-center justify-center gap-3 flex-wrap">
                 <button
                     type="submit"
@@ -103,6 +123,6 @@ export function AddAssignment() {
 
             {status === "success" && <p className="text-green-600 text-center">Завдання додано</p>}
             {status === "error" && <p className="text-red-600 text-center">Не вдалося додати завдання</p>}
-        </form>
+        </form >
     );
 }

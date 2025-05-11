@@ -1,22 +1,28 @@
 import { useForm } from "react-hook-form";
-import type { IAnimal } from "../../arcitecture/main";
 import { useAddAnimal } from "../../hooks/useAnimals";
 import { usePopupStore } from "../../store/popup";
 import { useEffect } from "react";
+import { Animal } from "../../arcitecture/Animal";
+import type { AnimalFormValues } from "../../arcitecture/types";
+
 export function AddAnimal() {
-    const { register, handleSubmit, formState: { errors }, reset } = useForm<IAnimal>();
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<AnimalFormValues>();
     const { addAnimal, status } = useAddAnimal();
     const { specialConfirmation, setSpecialConfirmation, close } = usePopupStore();
 
-    const onSubmit = (animal: IAnimal) => {
-        addAnimal.mutate(animal, {
+    const onSubmit = (animal: AnimalFormValues) => {
+        const { petSpecies, name, birthYear, sex } = animal;
+        const booleanSex = sex === "male";
+
+        const newAnimal = new Animal(petSpecies, name, birthYear, booleanSex);
+        addAnimal.mutate(newAnimal, {
             onSuccess: () => reset()
         });
     };
 
     const onClear = () => {
         reset();
-        close()
+        close();
     };
 
     useEffect(() => {
@@ -43,7 +49,7 @@ export function AddAnimal() {
                 {...register("petSpecies", {
                     required: "Назва тварини обов'язкова",
                     pattern: {
-                        value: /^[a-zA-Zа-яА-ЯіїєґІЇЄҐ\s'-]+$/u, //regex +
+                        value: /^[a-zA-Zа-яА-ЯіїєґІЇЄҐ\s'-]+$/u,
                         message: "Назва може містити лише літери (укр або англ)"
                     }
                 })}
@@ -53,7 +59,8 @@ export function AddAnimal() {
             <input
                 className="m-1 w-full border-2 border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="Введіть кличку тварини"
-                {...register("name", { required: "Кличка тварини обов'язкова" })} />
+                {...register("name", { required: "Кличка тварини обов'язкова" })}
+            />
             {errors.name && <p className="text-red-600">{errors.name.message}</p>}
 
             <input
@@ -77,7 +84,6 @@ export function AddAnimal() {
 
             <div className="flex gap-3 items-center">
                 <label className="block font-medium mb-1">Стать тварини:</label>
-
                 <div className="">
                     <label className="inline-flex items-center mr-4">
                         <input
@@ -115,6 +121,7 @@ export function AddAnimal() {
                     Очистити і вийти
                 </button>
             </div>
+
             {status === "success" && (
                 <p className="text-green-600 text-center">Тварина додана</p>
             )}
@@ -122,5 +129,5 @@ export function AddAnimal() {
                 <p className="text-red-600 text-center">Не вдалося додати тварину</p>
             )}
         </form>
-    )
+    );
 }

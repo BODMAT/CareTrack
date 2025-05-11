@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { IAnimal } from "../arcitecture/main";
 import { useAuth } from "./useAuth";
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
 import { db } from "../apis/firebase";
 import type { Status } from "../arcitecture/types";
 import { useState } from "react";
+import { Animal, AnimalDTO, type IAnimal } from "../arcitecture/Animal";
 
 // Для отримання тварин користувача
 export const useUserAnimals = () => {
@@ -15,7 +15,11 @@ export const useUserAnimals = () => {
         enabled: !!user,
         queryFn: async () => {
             const snapshot = await getDocs(collection(db, "users", user!.uid, "animals"));
-            const animals = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as IAnimal & { id: string }));
+            const animals = snapshot.docs.map(doc => {
+                const data = doc.data();
+                const id = doc.id;  // ID залишається як рядок
+                return Animal.fromDTO(new AnimalDTO(id, data.petSpecies, data.name, data.birthYear, data.sex));
+            });
             return animals;
         }
     });
@@ -32,10 +36,9 @@ export const useAddAnimal = () => {
     };
 
     const addAnimal = useMutation({
-        mutationFn: async (newAnimal: IAnimal) => {
+        mutationFn: async (newAnimal: Animal) => {
             const ref = collection(db, "users", user!.uid, "animals");
-            const docRef = await addDoc(ref, newAnimal);
-            return docRef;
+            await addDoc(ref, newAnimal.toPlain());
         },
         onSuccess: () => {
             setStatus("success");
@@ -51,7 +54,6 @@ export const useAddAnimal = () => {
 
     return { addAnimal, status };
 };
-
 
 // Видалення тварини
 export const useDeleteAnimal = () => {
@@ -80,7 +82,7 @@ export const useDeleteAnimal = () => {
         }
     });
 
-    return { deleteAnimal, status }
+    return { deleteAnimal, status };
 };
 
 // Оновлення інформації про тварину
@@ -90,13 +92,12 @@ export const useUpdateAnimal = () => {
 
     return useMutation({
         mutationFn: async ({ id, data }: { id: string; data: Partial<IAnimal> }) => {
-            console.log("Updating animal with ID:", id, "Data:", data);
             const ref = doc(db, "users", user!.uid, "animals", id);
-            await updateDoc(ref, data);
-            console.log("Animal updated with ID:", id);
+            // Преобразуем data в AnimalDTO перед обновлением
+            const animalDTO = new AnimalDTO(id, data.petSpecies || "", data.name || "", data.birthYear || 0, data.sex || false);
+            await updateDoc(ref, { ...animalDTO });
         },
         onSuccess: () => {
-            console.log("Animal updated successfully, invalidating query...");
             queryClient.invalidateQueries({ queryKey: ["animals", user?.uid] });
         },
         onError: (error) => {
