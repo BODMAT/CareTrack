@@ -1,5 +1,8 @@
+
 import { MouseImgs } from "../MouseImgs";
 import { About } from "./About";
+import { Animals } from "./Animals";
+import { Assignments } from "./Assigments";
 import { ButtonsToModals } from "./ButtonsToModals";
 
 export function PageUser() {
@@ -7,7 +10,8 @@ export function PageUser() {
         <div className="relative">
             <About />
             <ButtonsToModals />
-
+            <Animals />
+            <Assignments />
             <MouseImgs />
         </div>
     )

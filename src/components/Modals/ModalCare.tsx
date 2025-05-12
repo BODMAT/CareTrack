@@ -8,7 +8,7 @@ import { Care, type ICare } from "../../architecture/Care";
 import type { Assignment } from "../../architecture/Assignment";
 import { useAuth } from "../../hooks/useAuth";
 
-export function AddCare() {
+export function ModalCare() {
     const { register, handleSubmit, formState: { errors }, reset, control, setValue } = useForm<ICare>();
     const { specialConfirmation, setSpecialConfirmation, close } = usePopupStore();
     const { addCare, status } = useAddCare();

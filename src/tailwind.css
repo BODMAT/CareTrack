@@ -26,12 +26,14 @@
         --color-text: #000000;
         --color-fixed: linear-gradient(90deg, #54fe95, #00ffcc); 
         --color-background: linear-gradient(135deg, #e0ffe0, #ccfff2);
+        --color-card: #78dbfc; 
       }
       
       :where(.dark, .dark *) {
         --color-text: #ffffff;
         --color-fixed: linear-gradient(135deg, #123720, #0f3237); 
         --color-background: linear-gradient(90deg, #042a20, #06443d);
+        --color-card: #0d2f3a;
       }
       
 }

@@ -8,7 +8,7 @@ import type { Work } from "../../architecture/types";
 
 const workOptions: Work[] = ["годування", "прибирання приміщення", "медогляд", "випас"];
 
-export function AddAssignment() {
+export function ModalAssignment() {
     const {
         register,
         handleSubmit,

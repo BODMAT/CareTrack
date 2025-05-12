@@ -1,4 +1,4 @@
-import type { Work } from "../architecture/Assignment";
+import type { Work } from "../architecture/types";
 
 export function getTheme() {
     const raw = localStorage.getItem('theme-storage-caretrack');
@@ -51,4 +51,11 @@ export function createAssignmentID(work: Work): string {
     ].join("");
 
     return `${cleanedWork}_${timestamp}`;
+}
+
+export function checkBeforeDelete(action: () => void) {
+    const answer = confirm("Зберегти зміни?");
+    if (answer) {
+        action();
+    }
 }
