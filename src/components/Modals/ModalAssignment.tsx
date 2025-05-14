@@ -3,7 +3,7 @@ import { useAddAssignment } from "../../hooks/useAssignments";
 import { useEffect, useState } from "react";
 import { usePopupStore } from "../../store/popup";
 import { useUserAnimals } from "../../hooks/useAnimals";
-import type { IAssignment } from "../../architecture/Assignment";
+import { Assignment, type IAssignment } from "../../architecture/Assignment";
 import type { Work } from "../../architecture/types";
 
 const workOptions: Work[] = ["годування", "прибирання приміщення", "медогляд", "випас"];
@@ -21,14 +21,12 @@ export function ModalAssignment() {
     const { data: animals = [] } = useUserAnimals();
 
     const [animalIndex, setAnimalIndex] = useState<number>(-1);
-    const onSubmit = (assignment: IAssignment) => {
-        addAssignment.mutate(
-            {
-                ...assignment,
-                animal: animals[animalIndex],
-            },
-            { onSuccess: () => reset() }
-        );
+    const onSubmit = (assignmentForm: IAssignment) => {
+        const assignment = new Assignment(animals[animalIndex], assignmentForm.work, assignmentForm.price);
+
+        addAssignment.mutate(assignment, {
+            onSuccess: () => reset()
+        });
     };
 
     const onClear = () => {
@@ -117,7 +115,7 @@ export function ModalAssignment() {
                     onClick={onClear}
                     className="text-[var(--color-text)] fontText px-8 py-5 rounded-2xl bg-[image:var(--color-background)] border-2 transition-transform hover:scale-95 hover:shadow-xl cursor-pointer"
                 >
-                    Очистити і вийти
+                    Вийти без збереження змін
                 </button>
             </div>
 

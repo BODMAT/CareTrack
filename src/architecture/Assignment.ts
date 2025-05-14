@@ -1,5 +1,6 @@
+import { findAnimal } from "../apis/findById";
 import { createAssignmentID } from "../utils/utils";
-import { Animal, type IAnimal } from "./Animal";
+import { Animal } from "./Animal";
 import type { Work } from "./types";
 
 export interface IAssignment {
@@ -42,22 +43,21 @@ export class Assignment implements IAssignment {
     toPlain(): IAssignment {
         return {
             id: this._id,
-            animal: JSON.stringify(this.animal.toPlain()), // запарсимо JSON-рядок
+            animal: this.animal.id,
             work: this._work,
             price: this._price,
         };
     }
 
-    static fromDTO(dto: AssignmentDTO): Assignment {
-        const animalPlain = JSON.parse(dto.animal as string) as IAnimal;
-        const animal = Animal.fromDTO(animalPlain);
+    static async fromDTO(dto: AssignmentDTO, userId: string): Promise<Assignment> {
+        const animal = await findAnimal(userId, dto.animal);
         return new Assignment(animal, dto.work, dto.price, dto.id);
     }
 }
 
 export class AssignmentDTO implements IAssignment {
     readonly id: string;
-    readonly animal: string; // JSON.stringify(animal.toPlain())
+    readonly animal: string; // id of Animal
     readonly work: Work;
     readonly price: number;
 

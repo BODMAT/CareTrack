@@ -17,8 +17,10 @@ export const useUserAnimals = () => {
             const snapshot = await getDocs(collection(db, "users", user!.uid, "animals"));
             const animals = snapshot.docs.map(doc => {
                 const data = doc.data();
-                const id = doc.id;  // ID залишається як рядок
-                return Animal.fromDTO(new AnimalDTO(id, data.petSpecies, data.name, data.birthYear, data.sex));
+                const id = doc.id;
+                const result = Animal.fromDTO(new AnimalDTO(id, data.petSpecies, data.name, data.birthYear, data.sex));
+                console.log("animals: ", result);
+                return result;
             });
             return animals;
         }
@@ -44,6 +46,8 @@ export const useAddAnimal = () => {
             setStatus("success");
             clearStatusAfterDelay();
             queryClient.invalidateQueries({ queryKey: ["animals", user?.uid] });
+            queryClient.invalidateQueries({ queryKey: ["assignments", user?.uid] });
+            queryClient.invalidateQueries({ queryKey: ["cares", user?.uid] });
         },
         onError: (error) => {
             setStatus("error");
@@ -74,6 +78,8 @@ export const useDeleteAnimal = () => {
             setStatus("success");
             clearStatusAfterDelay();
             queryClient.invalidateQueries({ queryKey: ["animals", user?.uid] });
+            queryClient.invalidateQueries({ queryKey: ["assignments", user?.uid] });
+            queryClient.invalidateQueries({ queryKey: ["cares", user?.uid] });
         },
         onError: (error) => {
             setStatus("error");
@@ -93,15 +99,27 @@ export const useUpdateAnimal = () => {
     return useMutation({
         mutationFn: async ({ id, data }: { id: string; data: Partial<IAnimal> }) => {
             const ref = doc(db, "users", user!.uid, "animals", id);
-            // Преобразуем data в AnimalDTO перед обновлением
             const animalDTO = new AnimalDTO(id, data.petSpecies || "", data.name || "", data.birthYear || 0, data.sex || false);
             await updateDoc(ref, { ...animalDTO });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["animals", user?.uid] });
+            queryClient.invalidateQueries({ queryKey: ["assignments", user?.uid] });
+            queryClient.invalidateQueries({ queryKey: ["cares", user?.uid] });
         },
         onError: (error) => {
             console.error("Error updating animal:", error);
         }
     });
 };
+
+// Пошук тварини по айді
+// export const useFindAnimal = (id: string | undefined) => {
+//     const { user } = useAuth();
+
+//     return useQuery({
+//         queryKey: ['animal', user?.uid, id],
+//         enabled: !!user && !!id,
+//         queryFn: () => findAnimal(user!.uid, id!)
+//     });
+// };

@@ -1,9 +1,12 @@
-import { Assignment, AssignmentDTO, type IAssignment } from "./Assignment";
+import { findAssignmentById } from "../apis/findById";
+import { createCareID } from "../utils/utils";
+import { Assignment } from "./Assignment";
 
 export interface ICare {
+    id: string;
     ownersSurname: string;
-    date: Date | string[]; // NativeClass | DTO
-    assignments: (Assignment | string)[]; // Array of Assignment or string (DTO)
+    date: Date | string; // NativeClass | string in DB
+    assignments: (Assignment | string)[]; // Array of Assignment or string ids
 
     // methods for native
     addOrder?: (assignment: Assignment) => void;
@@ -11,25 +14,31 @@ export interface ICare {
 }
 
 export class Care implements ICare {
+    private _id: string
     private _ownersSurname: string;
-    private _date: Date | string[];
-    private _assignments: (Assignment | string)[];
+    private _date: Date | string;
+    private _assignments: Assignment[];
 
-    constructor(ownersSurname: string, date: Date | string[], assignments: (Assignment | string)[]) {
+    constructor(ownersSurname: string, date: Date | string, assignments: Assignment[], id?: string) {
+        this._id = id || createCareID(ownersSurname);
         this._ownersSurname = ownersSurname;
         this._date = date;
         this._assignments = assignments;
+    }
+
+    get id(): string {
+        return this._id;
     }
 
     get ownersSurname(): string {
         return this._ownersSurname;
     }
 
-    get date(): Date | string[] {
+    get date(): Date | string {
         return this._date;
     }
 
-    get assignments(): (Assignment | string)[] {
+    get assignments(): (Assignment)[] {
         return this._assignments;
     }
 
@@ -42,55 +51,39 @@ export class Care implements ICare {
         return `${this._ownersSurname}, завдань: ${assignmentCount}`;
     }
 
-    getAssignments(): Assignment[] {
-        return this._assignments.map((assignment) =>
-            typeof assignment === "string" ? Assignment.fromDTO(JSON.parse(assignment)) : assignment
-        );
-    }
-
     //! Допоміжні методи
-    static fromDTO(dto: CareDTO): Care {
-        const assignments = dto.assignments.map((assignmentStr) => {
-            const parsed = JSON.parse(assignmentStr) as IAssignment;
-            const dto = new AssignmentDTO(
-                parsed.id,
-                parsed.animal as string,
-                parsed.work,
-                parsed.price
-            );
-            return Assignment.fromDTO(dto);
-        });
+    static async fromDTO(dto: CareDTO, userId: string): Promise<Care> {
+        const assignments = await Promise.all(
+            dto.assignments.map((assignmentId) =>
+                findAssignmentById(userId, assignmentId)
+            )
+        );
 
-        return new Care(dto.ownersSurname, dto.date, assignments);
+        return new Care(dto.ownersSurname, dto.date, assignments, dto.id);
     }
 
     toPlain(): ICare {
         return {
+            id: this._id,
             ownersSurname: this._ownersSurname,
             date: this._date,
-            assignments: this._assignments.map((a) =>
-                typeof a === "string" ? a : JSON.stringify(a.toPlain())
+            assignments: this._assignments.map((a: Assignment) =>
+                a.id
             ),
         };
     }
 }
 
 export class CareDTO implements ICare {
+    readonly id: string
     readonly ownersSurname: string;
-    readonly date: string[]; // Масив рядків для кількох дат
-    readonly assignments: string[]; // Масив серіалізованих рядків (DTO) для завдань
+    readonly date: string;
+    readonly assignments: string[];
 
-    constructor(ownersSurname: string, date: string[], assignments: string[]) {
+    constructor(ownersSurname: string, date: string, assignments: string[], id: string) {
+        this.id = id;
         this.ownersSurname = ownersSurname;
         this.date = date;
         this.assignments = assignments;
-    }
-
-    static fromCare(care: Care): CareDTO {
-        return new CareDTO(
-            care.ownersSurname,
-            Array.isArray(care.date) ? care.date : [care.date.toISOString()],
-            care.getAssignments().map((a) => JSON.stringify(a.toPlain()))
-        );
     }
 }

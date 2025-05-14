@@ -12,10 +12,9 @@ export function ModalAnimal({ id }: { id?: string }) {
     const { data: animals } = useUserAnimals();
     const { specialConfirmation, setSpecialConfirmation, close } = usePopupStore();
 
-    // знайдемо тварину, якщо передано id
+    //!!!!!!!!!!!!!!! необхіден щоб розрізняти щи модалка для апдейту чи створення 
     const currentAnimal = useMemo(() => animals?.find(a => a.id === id), [animals, id]);
 
-    // заповнюємо поля, якщо редагування
     useEffect(() => {
         if (currentAnimal) {
             reset({
@@ -141,7 +140,7 @@ export function ModalAnimal({ id }: { id?: string }) {
                     onClick={onClear}
                     className="text-[var(--color-text)] fontText px-8 py-5 rounded-2xl bg-[image:var(--color-background)] border-2 transition-transform hover:scale-95 hover:shadow-xl cursor-pointer"
                 >
-                    Очистити і вийти
+                    Вийти без збереження змін
                 </button>
             </div>
 

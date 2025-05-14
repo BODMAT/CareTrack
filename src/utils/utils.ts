@@ -34,7 +34,9 @@ export function createAnimalID(petSpecies: string, name: string): string {
         String(now.getSeconds()).padStart(2, "0"),
     ].join("");
 
-    return `${cleanedSpecies}_${cleanedName}_${timestamp}`;
+    const random = Math.random().toString(36).slice(2, 6);
+
+    return `${cleanedSpecies}_${cleanedName}_${timestamp}_${random}`;
 }
 
 export function createAssignmentID(work: Work): string {
@@ -50,7 +52,25 @@ export function createAssignmentID(work: Work): string {
         String(now.getSeconds()).padStart(2, "0"),
     ].join("");
 
-    return `${cleanedWork}_${timestamp}`;
+    const random = Math.random().toString(36).slice(2, 6);
+
+    return `${cleanedWork}_${timestamp}_${random}`;
+}
+
+export function createCareID(name: string): string {
+    const cleanedName = name.trim().toLowerCase().replace(/\s+/g, "-");
+    const now = new Date();
+    const timestamp = [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, "0"),
+        String(now.getDate()).padStart(2, "0"),
+        String(now.getHours()).padStart(2, "0"),
+        String(now.getMinutes()).padStart(2, "0"),
+        String(now.getSeconds()).padStart(2, "0"),
+    ].join("");
+
+    const random = Math.random().toString(36).slice(2, 6);
+    return `${cleanedName}_${timestamp}_${random}`;
 }
 
 export function checkBeforeDelete(action: () => void) {

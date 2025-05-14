@@ -13,12 +13,21 @@ export const useUserCares = () => {
         queryKey: ["cares", user?.uid],
         enabled: !!user,
         queryFn: async () => {
-            const snapshot = await getDocs(collection(db, "users", user!.uid, "cares"));
-            return snapshot.docs.map((docSnap) => {
-                const data = docSnap.data();
-                const careDto = new CareDTO(data.ownersSurname, data.date, data.assignments);
-                return Care.fromDTO(careDto);
-            });
+            if (!user?.uid) {
+                throw new Error("User ID is missing");
+            }
+            const snapshot = await getDocs(collection(db, "users", user.uid, "cares"));
+            const assignments: Care[] = await Promise.all(
+                snapshot.docs.map(async (doc) => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    const dto = new CareDTO(data.ownersSurname, data.date, data.assignments, id);
+                    const result = await Care.fromDTO(dto, user.uid);
+                    console.log("cares: ", result);
+                    return result
+                })
+            );
+            return assignments;
         },
     });
 };
@@ -53,11 +62,6 @@ export const useAddCare = () => {
     return { addCare, status };
 };
 
-interface ICarePlain {
-    [key: string]: any;
-}
-
-
 export const useUpdateCare = () => {
     const [status, setStatus] = useState<Status>(null);
     const queryClient = useQueryClient();
@@ -75,9 +79,15 @@ export const useUpdateCare = () => {
             id: string;
             updatedCare: Care;
         }) => {
+            const care = new Care(
+                updatedCare.ownersSurname,
+                updatedCare.date,
+                updatedCare.assignments,
+                id
+            );
             const ref = doc(db, "users", user!.uid, "cares", id);
-            const plain: ICarePlain = updatedCare.toPlain();  // Приводимо до типу, який підтримує індексування
-            await updateDoc(ref, plain);
+            const plain: ICare = care.toPlain();
+            await updateDoc(ref, { ...plain });
         },
         onSuccess: () => {
             setStatus("success");

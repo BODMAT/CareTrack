@@ -5,21 +5,30 @@ import { Assignment, AssignmentDTO, type IAssignment } from '../architecture/Ass
 import { db } from '../apis/firebase';
 import { useState } from 'react';
 import type { Status } from '../architecture/types';
-import { Animal } from '../architecture/Animal';
 
 export const useUserAssignments = () => {
     const { user } = useAuth();
 
     return useQuery<Assignment[]>({
         queryKey: ["assignments", user?.uid],
-        enabled: !!user,  // Запит лише якщо користувач автентифікований
+        enabled: !!user,
         queryFn: async () => {
-            const snapshot = await getDocs(collection(db, "users", user!.uid, "assignments"));
-            return snapshot.docs.map(doc => {
-                const data = doc.data();
-                const id = doc.id;  // ID залишається як рядок
-                return Assignment.fromDTO(new AssignmentDTO(id, data.animal, data.work, data.price)); // Використовуємо fromDTO для перетворення даних у об'єкти Assignment
-            });
+            if (!user?.uid) {
+                throw new Error("User ID is missing");
+            }
+
+            const snapshot = await getDocs(collection(db, "users", user.uid, "assignments"));
+            const assignments: Assignment[] = await Promise.all(
+                snapshot.docs.map(async (doc) => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    const dto = new AssignmentDTO(id, data.animal, data.work, data.price);
+                    const result = await Assignment.fromDTO(dto, user.uid);
+                    console.log("assignments: ", result);
+                    return result;
+                })
+            );
+            return assignments;
         },
     });
 };
@@ -34,21 +43,16 @@ export const useAddAssignment = () => {
     };
 
     const addAssignment = useMutation({
-        mutationFn: async (newAssignment: IAssignment) => {
-            const animal =
-                typeof newAssignment.animal === "string"
-                    ? Animal.fromDTO(JSON.parse(newAssignment.animal))
-                    : newAssignment.animal;
-
-            const assignment = new Assignment(animal, newAssignment.work, newAssignment.price);
+        mutationFn: async (newAssignment: Assignment) => {
             const ref = collection(db, "users", user!.uid, "assignments");
-            const docRef = await addDoc(ref, assignment.toPlain());
+            const docRef = await addDoc(ref, newAssignment.toPlain());
             return docRef;
         },
         onSuccess: () => {
             setStatus("success");
             clearStatusAfterDelay();
             queryClient.invalidateQueries({ queryKey: ["assignments", user?.uid] });
+            queryClient.invalidateQueries({ queryKey: ["cares", user?.uid] });
         },
         onError: (error) => {
             setStatus("error");
@@ -75,31 +79,23 @@ export const useUpdateAssignment = () => {
             updatedAssignment,
         }: {
             id: string;
-            updatedAssignment: IAssignment;
+            updatedAssignment: Assignment;
         }) => {
-            // Гарантуємо, що animal — це об'єкт Animal
-            const animal =
-                typeof updatedAssignment.animal === "string"
-                    ? Animal.fromDTO(JSON.parse(updatedAssignment.animal))
-                    : updatedAssignment.animal;
-
             const assignment = new Assignment(
-                animal,
+                updatedAssignment.animal,
                 updatedAssignment.work,
                 updatedAssignment.price,
                 id
             );
-
             const ref = doc(db, "users", user!.uid, "assignments", id);
-
-            // через сувору типізацію Firestore SDK
-            const plain = assignment.toPlain();
+            const plain: IAssignment = assignment.toPlain();
             await updateDoc(ref, { ...plain });
         },
         onSuccess: () => {
             setStatus("success");
             clearStatusAfterDelay();
             queryClient.invalidateQueries({ queryKey: ["assignments", user?.uid] });
+            queryClient.invalidateQueries({ queryKey: ["cares", user?.uid] });
         },
         onError: (error) => {
             setStatus("error");
@@ -130,6 +126,7 @@ export const useDeleteAssignment = () => {
             setStatus("success");
             clearStatusAfterDelay();
             queryClient.invalidateQueries({ queryKey: ["assignments", user?.uid] });
+            queryClient.invalidateQueries({ queryKey: ["cares", user?.uid] });
         },
         onError: (error) => {
             setStatus("error");
@@ -140,3 +137,16 @@ export const useDeleteAssignment = () => {
 
     return { deleteAssignment, status };
 };
+
+// export const useAssignmentById = (id: string | null) => {
+//     const { user } = useAuth();
+
+//     return useQuery<Assignment | null>({
+//         queryKey: ["assignment", user?.uid, id],
+//         enabled: !!user && !!id,
+//         queryFn: async () => {
+//             if (!user?.uid || !id) return null;
+//             return findAssignmentById(user.uid, id);
+//         }
+//     });
+// };

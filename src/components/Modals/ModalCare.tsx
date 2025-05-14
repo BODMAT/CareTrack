@@ -66,7 +66,6 @@ export function ModalCare() {
         <form className="fontText flex flex-col gap-2 max-h-[80vh] overflow-y-auto overflow-x-hidden myContainer" onSubmit={handleSubmit(onSubmit)}>
 
             <input
-                defaultValue={(user && user.displayName) ? user.displayName : ""}
                 type="text"
                 className="m-1 w-full border-2 border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="Введіть прізвище власника"
@@ -90,7 +89,7 @@ export function ModalCare() {
                         {...field}
                         isMulti
                         options={assignmentOptions}
-                        onChange={handleSelectChange} // Обробник зміни
+                        onChange={handleSelectChange}
                         classNamePrefix="select"
                         className="m-1 w-full border-2 border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
@@ -110,7 +109,7 @@ export function ModalCare() {
                     onClick={onClear}
                     className="text-[var(--color-text)] fontText px-8 py-5 rounded-2xl bg-[image:var(--color-background)] border-2 transition-transform hover:scale-95 hover:shadow-xl cursor-pointer"
                 >
-                    Очистити і вийти
+                    Вийти без збереження змін
                 </button>
             </div>
 

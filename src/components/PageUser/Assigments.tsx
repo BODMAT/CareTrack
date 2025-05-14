@@ -15,19 +15,19 @@ export function Assignments() {
     }
 
     if (error) {
-        return <p className="myContainer text-[var(--color-text)] fontTitle text-[26px] mb-4 md:indent-5">Помилка при завантаженні завдань.</p>;
+        return <p className="myContainer text-[var(--color-text)] fontTitle text-[26px] mb-4 md:indent-5">Помилка при завантаженні нарядів.</p>;
     }
 
     if (!assignments || assignments.length === 0) {
-        return <p className="myContainer text-[var(--color-text)] fontTitle text-[26px] mb-4 md:indent-5">У вас ще немає жодного завдання.</p>;
+        return <p className="myContainer text-[var(--color-text)] fontTitle text-[26px] mb-4 md:indent-5">У вас ще немає жодного наряду.</p>;
     }
 
     return (
         <section className="myContainer transitioned text-[var(--color-text)] py-15 border-t-2">
-            <h2 className="fontTitle text-[26px] mb-4 md:indent-5">Завдання:</h2>
+            <h2 className="fontTitle text-[26px] mb-4 md:indent-5">Наряди:</h2>
             <div className="flex flex-wrap gap-7">
                 {assignments.map((assignment) => (
-                    <div key={assignment.id} className="flex-1/4 max-xl:flex-1/3 max-lg:flex-1/2 max-md:flex-[1_1_100%] p-4 rounded-xl bg-[var(--color-card)] shadow border flex justify-between items-start">
+                    <div key={assignment.id} className={`flex-1/4 max-xl:flex-1/3 max-lg:flex-1/2 max-md:flex-[1_1_100%] p-4 rounded-xl bg-[var(--color-card)] shadow border flex justify-between items-start ${assignment.animal.name === "Тварина можливо була примусово видалена з іншого місця" ? "bg-red-500 rounded-xl" : ""}`}>
                         <div>
                             <p className="font-semibold">{assignment.animal.name}</p>
                             <span className="text-sm">Вид: {assignment.animal.petSpecies} </span>
@@ -39,13 +39,13 @@ export function Assignments() {
                         <div className="flex gap-2">
                             <button
                                 onClick={() => checkBeforeDelete(() => deleteAssignment.mutate(assignment.id))}
-                                className="cursor-pointer transitioned hover:scale-90"
+                                className="cursor-pointer transitioned hover:scale-90 w-6"
                             >
                                 <img className="w-6" src={CrossSVG} alt="cross" />
                             </button>
                             <button
-                                onClick={() => open("Форма для редагування завдання", <ModalAssignment />, true)}
-                                className="cursor-pointer transitioned hover:scale-90"
+                                onClick={() => open("Форма для редагування завдання", <ModalAssignment />, true)} //!props!!!
+                                className="cursor-pointer transitioned hover:scale-90 w-7"
                             >
                                 <img className="w-7" src={EditSVG} alt="edit" />
                             </button>
