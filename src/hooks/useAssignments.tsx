@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import { useAuth } from './useAuth';
 import { Assignment, AssignmentDTO, type IAssignment } from '../architecture/Assignment';
 import { db } from '../apis/firebase';
@@ -21,10 +21,9 @@ export const useUserAssignments = () => {
             const assignments: Assignment[] = await Promise.all(
                 snapshot.docs.map(async (doc) => {
                     const data = doc.data();
-                    const id = doc.id;
-                    const dto = new AssignmentDTO(id, data.animal, data.work, data.price);
+                    const dto = new AssignmentDTO(data.id, data.animal, data.work, data.price);
                     const result = await Assignment.fromDTO(dto, user.uid);
-                    console.log("assignments: ", result);
+                    // console.log("assignments: ", result);
                     return result;
                 })
             );
@@ -44,9 +43,8 @@ export const useAddAssignment = () => {
 
     const addAssignment = useMutation({
         mutationFn: async (newAssignment: Assignment) => {
-            const ref = collection(db, "users", user!.uid, "assignments");
-            const docRef = await addDoc(ref, newAssignment.toPlain());
-            return docRef;
+            const ref = doc(db, "users", user!.uid, "assignments", newAssignment.id);
+            await setDoc(ref, newAssignment.toPlain());
         },
         onSuccess: () => {
             setStatus("success");
@@ -81,14 +79,8 @@ export const useUpdateAssignment = () => {
             id: string;
             updatedAssignment: Assignment;
         }) => {
-            const assignment = new Assignment(
-                updatedAssignment.animal,
-                updatedAssignment.work,
-                updatedAssignment.price,
-                id
-            );
             const ref = doc(db, "users", user!.uid, "assignments", id);
-            const plain: IAssignment = assignment.toPlain();
+            const plain: IAssignment = updatedAssignment.toPlain();
             await updateDoc(ref, { ...plain });
         },
         onSuccess: () => {
@@ -137,16 +129,3 @@ export const useDeleteAssignment = () => {
 
     return { deleteAssignment, status };
 };
-
-// export const useAssignmentById = (id: string | null) => {
-//     const { user } = useAuth();
-
-//     return useQuery<Assignment | null>({
-//         queryKey: ["assignment", user?.uid, id],
-//         enabled: !!user && !!id,
-//         queryFn: async () => {
-//             if (!user?.uid || !id) return null;
-//             return findAssignmentById(user.uid, id);
-//         }
-//     });
-// };

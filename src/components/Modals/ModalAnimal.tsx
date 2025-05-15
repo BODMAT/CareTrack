@@ -12,7 +12,7 @@ export function ModalAnimal({ id }: { id?: string }) {
     const { data: animals } = useUserAnimals();
     const { specialConfirmation, setSpecialConfirmation, close } = usePopupStore();
 
-    //!!!!!!!!!!!!!!! необхіден щоб розрізняти щи модалка для апдейту чи створення 
+    //! щоб розрізняти чи попап для нової тварини або редагування
     const currentAnimal = useMemo(() => animals?.find(a => a.id === id), [animals, id]);
 
     useEffect(() => {
@@ -144,11 +144,17 @@ export function ModalAnimal({ id }: { id?: string }) {
                 </button>
             </div>
 
-            {status === "success" && (
+            {addStatus === "success" && (
                 <p className="text-green-600 text-center">Тварина додана</p>
             )}
-            {status === "error" && (
+            {addStatus === "error" && (
                 <p className="text-red-600 text-center">Не вдалося додати тварину</p>
+            )}
+            {updateStatus === "success" && (
+                <p className="text-green-600 text-center">Тварина змінена</p>
+            )}
+            {updateStatus === "error" && (
+                <p className="text-red-600 text-center">Не вдалося змінити тварину</p>
             )}
         </form>
     );

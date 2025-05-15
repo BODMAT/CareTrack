@@ -1,30 +1,69 @@
 import { Controller, useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePopupStore } from "../../store/popup";
 import { useUserAssignments } from "../../hooks/useAssignments";
 import Select from "react-select";
-import { useAddCare } from "../../hooks/useCare";
+import { useAddCare, useUpdateCare, useUserCares } from "../../hooks/useCare";
 import { Care, type ICare } from "../../architecture/Care";
 import type { Assignment } from "../../architecture/Assignment";
-import { useAuth } from "../../hooks/useAuth";
+import type { ISelectAssignment } from "../../architecture/types";
 
-export function ModalCare() {
+export function ModalCare({ id }: { id?: string }) {
     const { register, handleSubmit, formState: { errors }, reset, control, setValue } = useForm<ICare>();
     const { specialConfirmation, setSpecialConfirmation, close } = usePopupStore();
-    const { addCare, status } = useAddCare();
+    const { addCare, status: addStatus } = useAddCare();
     const { data: assignments = [] } = useUserAssignments();
+    const { data: cares = [] } = useUserCares();
     const [assignmentIndex, setAssignmentIndex] = useState<number[]>([]);
-    const { user } = useAuth()
+    const { updateCare, status: updateStatus } = useUpdateCare();
+
+    //! щоб розрізняти чи попап для нового догляду або редагування
+    const currentCare = useMemo(() => cares?.find(a => a.id === id), [cares, id]);
+
+    useEffect(() => {
+        if (currentCare && assignments.length > 0) {
+            const selectedOptions: ISelectAssignment[] = currentCare.assignments
+                .map(assignment => {
+                    const index = assignments.findIndex(a => a.id === assignment.id);
+                    if (index !== -1) {
+                        const a = assignments[index];
+                        return {
+                            ...a,
+                            value: a.id,
+                            label: `${a.animal.name} (Вид: ${a.animal.petSpecies}, ${a.animal.birthYear} року народження), ${a.work}, ${a.price} грн`,
+                            index
+                        };
+                    }
+                    return null;
+                })
+                .filter((opt): opt is ISelectAssignment => opt !== null);
+
+            setAssignmentIndex(selectedOptions.map(opt => opt.index));
+
+            reset({
+                assignments: selectedOptions,
+                ownersSurname: currentCare.ownersSurname,
+                date: currentCare.date,
+            });
+        }
+    }, [currentCare, reset, assignments])
 
     const onSubmit = (care: ICare) => {
-        addCare.mutate(
-            new Care(
-                care.ownersSurname,
-                care.date,
-                assignmentIndex.map(index => assignments[index])
-            ),
-            { onSuccess: () => reset() }
-        );
+        const resultCare = new Care(
+            care.ownersSurname,
+            care.date,
+            assignmentIndex.map(index => assignments[index]),
+            id
+        )
+        if (id) {
+            updateCare.mutate({ id: id, updatedCare: resultCare })
+        } else {
+            addCare.mutate(
+                resultCare
+                ,
+                { onSuccess: () => reset() }
+            );
+        }
     };
 
     const onClear = () => {
@@ -102,7 +141,7 @@ export function ModalCare() {
                     type="submit"
                     className="text-[var(--color-text)] fontText px-8 py-5 rounded-2xl bg-[image:var(--color-background)] border-2 transition-transform hover:scale-95 hover:shadow-xl cursor-pointer"
                 >
-                    Додати
+                    {id ? "Змінити" : "Додати"}
                 </button>
                 <button
                     type="button"
@@ -113,8 +152,10 @@ export function ModalCare() {
                 </button>
             </div>
 
-            {status === "success" && <p className="text-green-600 text-center">Догляд додано</p>}
-            {status === "error" && <p className="text-red-600 text-center">Не вдалося додати догляд</p>}
+            {addStatus === "success" && <p className="text-green-600 text-center">Догляд додано</p>}
+            {addStatus === "error" && <p className="text-red-600 text-center">Не вдалося додати догляд</p>}
+            {updateStatus === "success" && <p className="text-green-600 text-center">Догляд змінено</p>}
+            {updateStatus === "error" && <p className="text-red-600 text-center">Не вдалося змінити догляд</p>}
         </form>
     );
 }

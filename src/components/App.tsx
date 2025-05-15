@@ -20,6 +20,7 @@ export function App() {
           <Route path="*" element={<div className="fontTitle text-[50px] text-center p-30">Error Path</div>} />
         </Route>
       </Routes>
+
       {/* All PopUps in one portal */}
       <PopUp />
     </Router>

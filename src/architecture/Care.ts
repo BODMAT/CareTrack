@@ -47,8 +47,10 @@ export class Care implements ICare {
     }
 
     toShortString(): string {
-        const assignmentCount = this._assignments.length;
-        return `${this._ownersSurname}, завдань: ${assignmentCount}`;
+        const assignmentTotalCost = this._assignments.reduce((sum, assignment) => {
+            return sum + assignment.price;
+        }, 0);
+        return `Дата: ${this.date}, сумарна вартість всіх завдань: ${assignmentTotalCost} грн`;
     }
 
     //! Допоміжні методи

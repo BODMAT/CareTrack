@@ -44,7 +44,7 @@ export function Assignments() {
                                 <img className="w-6" src={CrossSVG} alt="cross" />
                             </button>
                             <button
-                                onClick={() => open("Форма для редагування завдання", <ModalAssignment />, true)} //!props!!!
+                                onClick={() => open("Форма для редагування завдання", <ModalAssignment id={assignment.id} />, true)}
                                 className="cursor-pointer transitioned hover:scale-90 w-7"
                             >
                                 <img className="w-7" src={EditSVG} alt="edit" />

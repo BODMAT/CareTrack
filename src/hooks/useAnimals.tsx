@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "./useAuth";
-import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../apis/firebase";
 import type { Status } from "../architecture/types";
 import { useState } from "react";
@@ -17,9 +17,8 @@ export const useUserAnimals = () => {
             const snapshot = await getDocs(collection(db, "users", user!.uid, "animals"));
             const animals = snapshot.docs.map(doc => {
                 const data = doc.data();
-                const id = doc.id;
-                const result = Animal.fromDTO(new AnimalDTO(id, data.petSpecies, data.name, data.birthYear, data.sex));
-                console.log("animals: ", result);
+                const result = Animal.fromDTO(new AnimalDTO(data.id, data.petSpecies, data.name, data.birthYear, data.sex));
+                // console.log("animals: ", result);
                 return result;
             });
             return animals;
@@ -39,8 +38,8 @@ export const useAddAnimal = () => {
 
     const addAnimal = useMutation({
         mutationFn: async (newAnimal: Animal) => {
-            const ref = collection(db, "users", user!.uid, "animals");
-            await addDoc(ref, newAnimal.toPlain());
+            const ref = doc(db, "users", user!.uid, "animals", newAnimal.id);
+            await setDoc(ref, newAnimal.toPlain());
         },
         onSuccess: () => {
             setStatus("success");
@@ -112,14 +111,3 @@ export const useUpdateAnimal = () => {
         }
     });
 };
-
-// Пошук тварини по айді
-// export const useFindAnimal = (id: string | undefined) => {
-//     const { user } = useAuth();
-
-//     return useQuery({
-//         queryKey: ['animal', user?.uid, id],
-//         enabled: !!user && !!id,
-//         queryFn: () => findAnimal(user!.uid, id!)
-//     });
-// };
