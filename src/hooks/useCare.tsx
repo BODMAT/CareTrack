@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc } from "firebase/firestore";
+import { collection, getDocs, updateDoc, deleteDoc, doc, setDoc } from "firebase/firestore";
 import { useAuth } from "./useAuth";
 import { db } from "../apis/firebase";
 import { useState } from "react";

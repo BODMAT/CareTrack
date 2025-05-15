@@ -61,8 +61,6 @@ export function ModalAnimal({ id }: { id?: string }) {
         }
     }, [specialConfirmation]);
 
-    const status = id ? updateStatus : addStatus;
-
     return (
         <form className="fontText flex flex-col gap-2 max-h-[80vh] overflow-y-auto overflow-x-hidden myContainer" onSubmit={handleSubmit(onSubmit)}>
             <input
