@@ -1,4 +1,4 @@
-import { useDeleteCare, useUserCares } from "../../hooks/useCare";
+import { useDeleteCare, useUserCares } from "../../hooks/userQuery/useCare";
 import { usePopupStore } from "../../store/popup";
 import { checkBeforeDelete } from "../../utils/utils";
 import CrossSVG from "../../assets/cross.svg";

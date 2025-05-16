@@ -1,7 +1,13 @@
+import { AdminAnimals } from "./AdminAnimals";
+import { AdminAssignments } from "./AdminAssignments";
+import { AdminCares } from "./AdminCares";
+
 export function PageAdmin() {
     return (
-        <div>
-            Admin panel with filters by users and work
+        <div className="relative">
+            <AdminAnimals />
+            <AdminAssignments />
+            <AdminCares />
         </div>
     )
 }

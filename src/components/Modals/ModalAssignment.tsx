@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
-import { useAddAssignment, useUpdateAssignment, useUserAssignments } from "../../hooks/useAssignments";
+import { useAddAssignment, useUpdateAssignment, useUserAssignments } from "../../hooks/userQuery/useAssignments";
 import { useEffect, useMemo, useState } from "react";
 import { usePopupStore } from "../../store/popup";
-import { useUserAnimals } from "../../hooks/useAnimals";
+import { useUserAnimals } from "../../hooks/userQuery/useAnimals";
 import { Assignment, type IAssignment } from "../../architecture/Assignment";
 import type { Work } from "../../architecture/types";
 

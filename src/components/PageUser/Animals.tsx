@@ -1,5 +1,5 @@
 import type { IAnimal } from "../../architecture/Animal";
-import { useDeleteAnimal, useUserAnimals } from "../../hooks/useAnimals";
+import { useDeleteAnimal, useUserAnimals } from "../../hooks/userQuery/useAnimals";
 import CrossSVG from "../../assets/cross.svg";
 import EditSVG from "../../assets/edit.svg";
 import { checkBeforeDelete } from "../../utils/utils";

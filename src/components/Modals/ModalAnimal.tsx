@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useAddAnimal, useUpdateAnimal, useUserAnimals } from "../../hooks/useAnimals";
+import { useAddAnimal, useUpdateAnimal, useUserAnimals } from "../../hooks/userQuery/useAnimals";
 import { usePopupStore } from "../../store/popup";
 import { useEffect, useMemo } from "react";
 import { Animal } from "../../architecture/Animal";

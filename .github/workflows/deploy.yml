@@ -22,7 +22,7 @@ jobs:
 
       # Крок 3: Встановлюємо залежності
       - name: Install dependencies
-        run: npm ci  # використовуємо "npm ci" для чистої установки залежностей
+        run: npm ci
 
       # Крок 4: Розшифровуємо .env.production.gpg
       - name: Decrypt .env.production.gpg
@@ -36,10 +36,14 @@ jobs:
       - name: Build the project
         run: npm run build
 
+      # Копіюємо index.html як 404.html (для правильної обробки роутів)
+      - name: Copy index.html to 404.html
+        run: cp dist/index.html dist/404.html
+
       # Крок 6: Деплой на gh-pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           personal_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist  # директорія, де знаходиться результат білду
+          publish_dir: ./dist
           publish_branch: gh-pages

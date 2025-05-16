@@ -1,5 +1,5 @@
-import { useUpdateCare, useUserCares } from "../../hooks/useCare";
-import { useUserAssignments } from "../../hooks/useAssignments";
+import { useUpdateCare, useUserCares } from "../../hooks/userQuery/useCare";
+import { useUserAssignments } from "../../hooks/userQuery/useAssignments";
 import type { Assignment } from "../../architecture/Assignment";
 import { Care } from "../../architecture/Care";
 import { useEffect, useMemo, useState } from "react";
@@ -25,17 +25,20 @@ export function AddAssignmentFromMethod({ careId }: { careId: string }) {
                 { id: updatedCare.id, updatedCare },
                 {
                     onSuccess: () => {
-                        setTempAddedIds(prev => new Set(prev).add(assignment.animal.id));
+                        setTempAddedIds(prev => new Set(prev).add(assignment.id));
                     },
                 }
             );
         }
     };
 
-    // Очистка тимчасових ID після оновлення currentCare.assignments
+    // Очистка тимчасових ID після оновлення
     useEffect(() => {
         setTempAddedIds(new Set());
     }, [currentCare?.assignments]);
+
+    const isAlreadyAdded = (assignmentId: string) =>
+        currentCare?.assignments?.some((a) => a.id === assignmentId) || tempAddedIds.has(assignmentId);
 
 
     return (
@@ -45,7 +48,7 @@ export function AddAssignmentFromMethod({ careId }: { careId: string }) {
                     <button
                         onClick={() => {
                             if (
-                                !currentCare?.assignments?.some(a => a.animal.id === assignment.animal.id) &&
+                                !isAlreadyAdded(assignment.id) &&
                                 assignment.animal.name !== "Тварина можливо була примусово видалена з іншого місця"
                             ) {
                                 toAdd(assignment);
@@ -53,10 +56,8 @@ export function AddAssignmentFromMethod({ careId }: { careId: string }) {
                         }}
                         key={assignment.id}
                         className={`mb-1 p-2 rounded-xl cursor-pointer border-2 transitioned hover:scale-95
-    ${assignment.animal.name === "Тварина можливо була примусово видалена з іншого місця" ? "bg-red-500" : ""}
-    ${(currentCare?.assignments?.some(a => a.animal.id === assignment.animal.id) || tempAddedIds.has(assignment.animal.id))
-                                ? "bg-green-500"
-                                : ""}`}
+        ${assignment.animal.name === "Тварина можливо була примусово видалена з іншого місця" ? "bg-red-500" : ""}
+        ${isAlreadyAdded(assignment.id) ? "bg-green-500" : ""}`}
                     >
                         <span className="text-sm">Назва: {assignment.animal.name} </span>
                         <span className="text-sm">Вид: {assignment.animal.petSpecies} </span>

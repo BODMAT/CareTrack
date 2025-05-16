@@ -1,9 +1,9 @@
 import { Controller, useForm } from "react-hook-form";
 import { useEffect, useMemo, useState } from "react";
 import { usePopupStore } from "../../store/popup";
-import { useUserAssignments } from "../../hooks/useAssignments";
+import { useUserAssignments } from "../../hooks/userQuery/useAssignments";
 import Select from "react-select";
-import { useAddCare, useUpdateCare, useUserCares } from "../../hooks/useCare";
+import { useAddCare, useUpdateCare, useUserCares } from "../../hooks/userQuery/useCare";
 import { Care, type ICare } from "../../architecture/Care";
 import type { Assignment } from "../../architecture/Assignment";
 import type { ISelectAssignment } from "../../architecture/types";
@@ -23,7 +23,7 @@ export function ModalCare({ id }: { id?: string }) {
     useEffect(() => {
         if (currentCare && assignments.length > 0) {
             const selectedOptions: ISelectAssignment[] = currentCare.assignments
-                .map(assignment => {
+                .map((assignment: Assignment) => {
                     const index = assignments.findIndex(a => a.id === assignment.id);
                     if (index !== -1) {
                         const a = assignments[index];
@@ -36,7 +36,7 @@ export function ModalCare({ id }: { id?: string }) {
                     }
                     return null;
                 })
-                .filter((opt): opt is ISelectAssignment => opt !== null);
+                .filter((opt: any): opt is ISelectAssignment => opt !== null);
 
             setAssignmentIndex(selectedOptions.map(opt => opt.index));
 

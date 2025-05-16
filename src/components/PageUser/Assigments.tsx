@@ -1,4 +1,4 @@
-import { useDeleteAssignment, useUserAssignments } from "../../hooks/useAssignments";
+import { useDeleteAssignment, useUserAssignments } from "../../hooks/userQuery/useAssignments";
 import { usePopupStore } from "../../store/popup";
 import { checkBeforeDelete } from "../../utils/utils";
 import CrossSVG from "../../assets/cross.svg";

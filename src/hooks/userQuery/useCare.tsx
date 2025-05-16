@@ -1,10 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { collection, getDocs, updateDoc, deleteDoc, doc, setDoc } from "firebase/firestore";
-import { useAuth } from "./useAuth";
-import { db } from "../apis/firebase";
+import { useAuth } from "../useAuth";
+import { db } from "../../apis/firebase";
 import { useState } from "react";
-import type { Status } from "../architecture/types";
-import { Care, CareDTO, type ICare } from "../architecture/Care";
+import type { Status } from "../../architecture/types";
+import { Care, CareDTO, type ICare } from "../../architecture/Care";
 
 export const useUserCares = () => {
     const { user } = useAuth();
