@@ -25,7 +25,7 @@ export function AdminAnimals() {
             <div className="flex flex-wrap gap-7">
                 {usersWithAnimals.map(({ user, animals }) => (
                     <div key={user.id} className="w-full">
-                        <h3 className="mb-3 text-2xl font-semibold">Користувач: {user.email} ({user.displayName || user.id})</h3>
+                        <h3 className="mb-3 text-2xl font-semibold">Користувач: ({user.displayName || user.id})</h3>
                         <div className="flex flex-wrap gap-7 mb-8">
                             {animals.map((animal: IAnimal) => (
                                 <div

@@ -25,9 +25,9 @@ export function AdminCares() {
             <h2 className="fontTitle text-[36px] mb-4 md:indent-5">Усі догляди користувачів:</h2>
 
             {adminGroups.map(group => (
-                <div key={group.user.id}>
-                    <h3 className="text-lg font-bold mt-6 mb-2">
-                        Користувач: {group.user.displayName || group.user.email || group.user.id}
+                <div className="mb-10" key={group.user.id}>
+                    <h3 className="text-xl font-semibold mb-2">
+                        Користувач: {group.user.displayName || group.user.id}
                     </h3>
 
                     <div className="flex flex-wrap gap-7">

@@ -24,7 +24,7 @@ export function AdminAssignments() {
 
             {data.map(({ user, assignments }) => (
                 <div key={user.id} className="mb-10">
-                    <h3 className="text-xl font-semibold mb-2">{user.displayName || user.email || user.id}</h3>
+                    <h3 className="text-xl font-semibold mb-2">Користувач:  {user.displayName || user.id}</h3>
                     <div className="flex flex-wrap gap-7">
                         {assignments.map((assignment) => (
                             <div key={assignment.id} className={`flex-1/4 max-xl:flex-1/3 max-lg:flex-1/2 max-md:flex-[1_1_100%] p-4 rounded-xl bg-[var(--color-card)] shadow border flex justify-between items-start ${assignment.animal.name === "Тварина можливо була примусово видалена з іншого місця" ? "bg-red-500 rounded-xl" : ""}`}>
